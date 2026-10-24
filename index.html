@@ -1,67 +1,517 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>おみくじアプリ</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            background: #f5f5f5;
-            margin-top: 100px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キラキラ！開運おみくじ</title>
 
-        h1 {
-            color: #d32f2f;
-        }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-        button {
-            font-size: 20px;
-            padding: 10px 30px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            background: #ff9800;
-            color: white;
-        }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Hiragino Maru Gothic ProN", "Meiryo", sans-serif;
+  color: #663b83;
+  background: linear-gradient(135deg, #ffb6d9, #c9b6ff, #a8edff, #fff2a8);
+  background-size: 300% 300%;
+  animation: bgMove 9s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 14px;
+  overflow-x: hidden;
+}
 
-        button:hover {
-            background: #f57c00;
-        }
+@keyframes bgMove {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
 
-        #result {
-            margin-top: 40px;
-            font-size: 40px;
-            font-weight: bold;
-            color: #333;
-        }
-    </style>
+.sparkles {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sparkle {
+  position: absolute;
+  bottom: -40px;
+  animation: floatUp linear infinite;
+  opacity: .7;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0) rotate(0deg); opacity: 0; }
+  15% { opacity: .8; }
+  to { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  padding: 30px 22px;
+  border: 4px solid white;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 18px 50px #7545a344;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.badge {
+  display: inline-block;
+  padding: 7px 15px;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #ff85b3, #b68cff);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+h1 {
+  margin: 14px 0 6px;
+  font-size: clamp(27px, 7vw, 36px);
+  color: #a044c4;
+  text-shadow: 2px 3px 0 #ffe0f0;
+}
+
+.subtitle {
+  margin: 0 0 22px;
+  color: #9475ad;
+  font-size: 13px;
+}
+
+.omikuji-box {
+  position: relative;
+  padding: 22px 14px;
+  border: 3px dashed #ffc1dc;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff5fb, #f4f0ff);
+}
+
+.emoji {
+  font-size: 66px;
+  line-height: 1.3;
+  filter: drop-shadow(0 5px 5px #d3a7e0);
+}
+
+.result {
+  min-height: 62px;
+  margin: 12px 0 8px;
+  font-size: 44px;
+  font-weight: 900;
+  color: #ff55a2;
+  text-shadow: 2px 3px 0 white, 0 5px 15px #ffafd6;
+  overflow-wrap: anywhere;
+}
+
+.message {
+  min-height: 48px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #795b91;
+}
+
+.details {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 16px;
+  text-align: left;
+}
+
+.detail {
+  background: white;
+  border-radius: 13px;
+  padding: 11px;
+  font-size: 12px;
+  box-shadow: 0 3px 12px #c5a4da22;
+}
+
+.detail strong {
+  display: block;
+  color: #e55eaa;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.draw-btn {
+  position: relative;
+  width: 100%;
+  margin-top: 22px;
+  padding: 17px;
+  border-radius: 50px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(100deg, #ff68a7, #bb71f5, #6f9cff);
+  background-size: 200% auto;
+  box-shadow: 0 7px 0 #9b64c2, 0 12px 25px #b98bdd55;
+  transition: transform .15s, box-shadow .15s;
+  animation: buttonGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes buttonGlow {
+  from { filter: saturate(1); }
+  to { filter: saturate(1.5) brightness(1.08); }
+}
+
+.draw-btn:hover {
+  transform: translateY(-3px);
+  background-position: right center;
+}
+
+.draw-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #9b64c2;
+}
+
+.draw-btn:disabled {
+  cursor: wait;
+  opacity: .8;
+}
+
+.note {
+  margin-top: 18px;
+  color: #aa91b9;
+  font-size: 11px;
+}
+
+.result-pop {
+  animation: resultPop .65s cubic-bezier(.2, 1.7, .4, 1) both;
+}
+
+@keyframes resultPop {
+  0% { transform: scale(.15) rotate(-18deg); opacity: 0; }
+  65% { transform: scale(1.18) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.shaking {
+  animation: shake .65s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  15% { transform: translateX(-9px) rotate(-4deg); }
+  30% { transform: translateX(9px) rotate(4deg); }
+  45% { transform: translateX(-7px) rotate(-3deg); }
+  60% { transform: translateX(7px) rotate(3deg); }
+  75% { transform: translateX(-3px); }
+}
+
+.confetti {
+  position: fixed;
+  top: -20px;
+  z-index: 10;
+  pointer-events: none;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(-5vh) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(900deg) scale(.6); opacity: .1; }
+}
+
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: white;
+  pointer-events: none;
+  animation: flashOut .45s ease-out forwards;
+}
+
+@keyframes flashOut {
+  from { opacity: .85; }
+  to { opacity: 0; }
+}
+
+.footer {
+  margin-top: 18px;
+  font-size: 11px;
+  color: #b39bc2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<h1>🎋 おみくじ 🎋</h1>
+<div class="sparkles" id="sparkles"></div>
 
-<button onclick="drawFortune()">
-    おみくじを引く
-</button>
+<main class="app">
+  <div class="badge">✨ HAPPY FORTUNE ✨</div>
 
-<div id="result">？？？</div>
+  <h1>🌈 開運おみくじ 🌈</h1>
+  <p class="subtitle">今日のあなたに、幸運が訪れますように！</p>
+
+  <section class="omikuji-box" id="omikujiBox" aria-live="polite">
+    <div class="emoji" id="resultEmoji">🎋</div>
+    <div class="result" id="result">？？？</div>
+    <div class="message" id="message">
+      ボタンを押して<br>今日の運勢を占おう！
+    </div>
+
+    <div class="details" id="details">
+      <div class="detail">
+        <strong>💗 ラッキーアイテム</strong>
+        <span id="luckyItem">---</span>
+      </div>
+      <div class="detail">
+        <strong>🎨 ラッキーカラー</strong>
+        <span id="luckyColor">---</span>
+      </div>
+      <div class="detail">
+        <strong>💕 恋愛運</strong>
+        <span id="love">---</span>
+      </div>
+      <div class="detail">
+        <strong>💰 金運</strong>
+        <span id="money">---</span>
+      </div>
+    </div>
+  </section>
+
+  <button class="draw-btn" id="drawBtn" onclick="drawFortune()">
+    ✨ おみくじを引く！ ✨
+  </button>
+
+  <p class="note">何が出るかはお楽しみ！今日も笑顔でいこう 💖</p>
+  <div class="footer">MADE WITH LOVE ♡ FORTUNE FOR YOU</div>
+</main>
 
 <script>
-    function drawFortune() {
-        const fortunes = [
-            "🎉 大吉",
-            "😊 中吉",
-            "🙂 小吉",
-            "😌 吉",
-            "😐 末吉",
-            "😅 凶",
-            "💀 大凶"
-        ];
+const fortunes = [
+  {
+    name: "大大吉！",
+    emoji: "👑",
+    color: "#ff2995",
+    weight: 3,
+    message: "奇跡が起こる予感！最高にハッピーな一日！",
+    item: "キラキラのアクセサリー",
+    lucky: "ピンク",
+    love: "運命の出会い！？",
+    money: "思わぬ幸運あり！"
+  },
+  {
+    name: "大吉！",
+    emoji: "🌈",
+    color: "#ff4f9a",
+    weight: 17,
+    message: "何をしてもうまくいきそう！自信を持って進もう！",
+    item: "お気に入りの靴",
+    lucky: "ゴールド",
+    love: "笑顔が恋を呼ぶ！",
+    money: "うれしい予感！"
+  },
+  {
+    name: "中吉！",
+    emoji: "🌟",
+    color: "#ff8c42",
+    weight: 22,
+    message: "小さな幸せがいっぱい！感謝の気持ちを忘れずに。",
+    item: "甘いお菓子",
+    lucky: "オレンジ",
+    love: "会話を楽しんで！",
+    money: "計画的に使おう！"
+  },
+  {
+    name: "吉！",
+    emoji: "🍀",
+    color: "#25b88a",
+    weight: 25,
+    message: "穏やかでいい一日。いつも通りが幸運のカギ！",
+    item: "ハンカチ",
+    lucky: "ミントグリーン",
+    love: "優しさがポイント！",
+    money: "コツコツ貯めよう！"
+  },
+  {
+    name: "小吉！",
+    emoji: "🧸",
+    color: "#638cff",
+    weight: 18,
+    message: "焦らなくても大丈夫。マイペースで進もう！",
+    item: "温かい飲み物",
+    lucky: "水色",
+    love: "自然体がいちばん！",
+    money: "お得情報をチェック！"
+  },
+  {
+    name: "末吉！",
+    emoji: "🌷",
+    color: "#9a78d8",
+    weight: 10,
+    message: "これから運気が上昇！未来に期待しよう！",
+    item: "お気に入りの本",
+    lucky: "ラベンダー",
+    love: "ゆっくり育てよう！",
+    money: "無駄遣いに注意！"
+  },
+  {
+    name: "凶…？",
+    emoji: "🌧️",
+    color: "#77839b",
+    weight: 5,
+    message: "無理せず休む日も大切。明日はきっといい日！",
+    item: "お気に入りのお守り",
+    lucky: "ホワイト",
+    love: "焦らず自分を大切に！",
+    money: "今日は節約モード！"
+  }
+];
 
-        const index = Math.floor(Math.random() * fortunes.length);
+let busy = false;
 
-        document.getElementById("result").textContent = fortunes[index];
-    }
+function weightedFortune() {
+  const total = fortunes.reduce((sum, f) => sum + f.weight, 0);
+  let roll = Math.random() * total;
+
+  for (const fortune of fortunes) {
+    roll -= fortune.weight;
+    if (roll < 0) return fortune;
+  }
+
+  return fortunes[fortunes.length - 1];
+}
+
+function drawFortune() {
+  if (busy) return;
+  busy = true;
+
+  const btn = document.getElementById("drawBtn");
+  const box = document.getElementById("omikujiBox");
+  const result = document.getElementById("result");
+  const emoji = document.getElementById("resultEmoji");
+  const message = document.getElementById("message");
+  const details = document.getElementById("details");
+
+  btn.disabled = true;
+  btn.textContent = "🔮 運勢を占っています…";
+  details.style.display = "none";
+
+  result.textContent = "？？？";
+  result.style.color = "#b68cff";
+  emoji.textContent = "🎋";
+  message.textContent = "ドキドキ…幸運を呼び寄せ中！";
+
+  box.classList.remove("shaking");
+  void box.offsetWidth;
+  box.classList.add("shaking");
+
+  // おみくじを振る間のキラキラ演出
+  let count = 0;
+  const shuffle = setInterval(() => {
+    emoji.textContent = ["🎋", "✨", "🔮", "⭐", "🎊"][
+      Math.floor(Math.random() * 5)
+    ];
+    count++;
+    if (count >= 10) clearInterval(shuffle);
+  }, 100);
+
+  setTimeout(() => {
+    clearInterval(shuffle);
+    const f = weightedFortune();
+
+    emoji.textContent = f.emoji;
+    result.textContent = f.name;
+    result.style.color = f.color;
+    message.textContent = f.message;
+
+    document.getElementById("luckyItem").textContent = f.item;
+    document.getElementById("luckyColor").textContent = f.lucky;
+    document.getElementById("love").textContent = f.love;
+    document.getElementById("money").textContent = f.money;
+
+    details.style.display = "grid";
+
+    // 結果をポップに登場させる
+    [emoji, result, message].forEach(el => {
+      el.classList.remove("result-pop");
+      void el.offsetWidth;
+      el.classList.add("result-pop");
+    });
+
+    // 画面を一瞬光らせる
+    const flash = document.createElement("div");
+    flash.className = "flash";
+    document.body.appendChild(flash);
+    flash.addEventListener("animationend", () => flash.remove(), {
+      once: true
+    });
+
+    // 紙吹雪を発射！
+    launchConfetti(f.name === "大大吉！" || f.name === "大吉！" ? 150 : 85);
+
+    btn.disabled = false;
+    btn.textContent = "🔄 もう一度おみくじを引く！";
+    busy = false;
+  }, 1200);
+}
+
+function launchConfetti(amount) {
+  const colors = [
+    "#ff4f9a", "#ffd84d", "#73e6c2",
+    "#8b79ff", "#66cfff", "#ff8a5b"
+  ];
+
+  for (let i = 0; i < amount; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.textContent = Math.random() > 0.5 ? "✦" : "●";
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.color = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.fontSize = (10 + Math.random() * 18) + "px";
+    piece.style.animationDuration = (1.5 + Math.random() * 2.5) + "s";
+    piece.style.animationDelay = Math.random() * 0.5 + "s";
+
+    document.body.appendChild(piece);
+    piece.addEventListener("animationend", () => piece.remove(), {
+      once: true
+    });
+  }
+}
+
+// 背景にふわふわ浮かぶ星
+const sparkleContainer = document.getElementById("sparkles");
+
+for (let i = 0; i < 24; i++) {
+  const s = document.createElement("span");
+  s.className = "sparkle";
+  s.textContent = ["✦", "✧", "♡", "✨"][
+    Math.floor(Math.random() * 4)
+  ];
+  s.style.left = Math.random() * 100 + "%";
+  s.style.fontSize = (12 + Math.random() * 20) + "px";
+  s.style.animationDuration = (7 + Math.random() * 12) + "s";
+  s.style.animationDelay = (-Math.random() * 15) + "s";
+  sparkleContainer.appendChild(s);
+}
 </script>
+
+</body>
+</html>
